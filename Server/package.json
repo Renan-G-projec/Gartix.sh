@@ -1,0 +1,16 @@
+{
+  "name": "gartix-server",
+  "version": "1.0.0",
+  "description": "Gartix server",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node app.js"
+  },
+  "keywords": [],
+  "author": "Renan-G-projec",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
