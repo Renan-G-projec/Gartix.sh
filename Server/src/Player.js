@@ -3,6 +3,7 @@
 class Player {
     constructor(nickname, token) {
         this.nickname = nickname;
+        this.id = null;
 
         this.token = token; 
         this.commandsSent = 0;
@@ -15,6 +16,8 @@ class Player {
         this.isConnected = true;
         this.guessed = false;
     }
+
+    setId(id) { this.id = id; }
 
     addScore(score)  {
         this.score += score;
