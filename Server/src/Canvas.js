@@ -35,7 +35,7 @@ class Canvas {
         }
     }
 
-    // CREDITS TO THE LOGIC: NoBS Code https://youtu.be/CceepU1vIKo?si=za-Ab2yH5GK0XWj0
+    // CREDITS TO THE LOGIC: NoBS Code https://www.youtube.com/watch?v=CceepU1vIKo
     drawLine(x1, y1, x2, y2, character = "#") { 
         const deltaX = x2 - x1;
         const deltaY = y2 - y1;
@@ -55,7 +55,37 @@ class Canvas {
         }
     };
 
-    drawCircle() { };
+    // CREDITS AGAINTO THE TUTORIAL OF: NoBS Code https://www.youtube.com/watch?v=hpiILbMkF9w
+    drawCircle(xc, yc, radius, character = "#") {
+        const drawSimetric = (x, y) => {
+            this.drawPixel(xc + x, yc + y, character);
+            this.drawPixel(xc - x, yc + y, character);
+            this.drawPixel(xc + x, yc - y, character);
+            this.drawPixel(xc - x, yc - y, character);
+            this.drawPixel(xc + y, yc + x, character);
+            this.drawPixel(xc - y, yc + x, character);
+            this.drawPixel(xc + y, yc - x, character);
+            this.drawPixel(xc - y, yc - x, character);
+        }
+
+        let x = 0;
+        let y = -radius;
+
+        drawSimetric(x, y);
+        
+        let midpointY = y + 0.5;
+        
+        const radiusSquared = radius * radius;
+        while (x < -y) {
+            const insideTheCircle = x*x + midpointY * midpointY <= radiusSquared;
+            ++x;
+            if (!insideTheCircle) {
+                ++y;
+                midpointY = y + 0.5;
+            }
+            drawSimetric(x, y);
+        }
+    };
 }
 
 module.exports = Canvas;

@@ -4,5 +4,5 @@ const Room = require("./src/Room.js");
 
 const mockRoom = new Room();
 
-mockRoom.canvas.drawLine(10, 9, 10, 9);
+mockRoom.canvas.drawCircle(10, 10, 10);
 mockRoom.canvas.log();
