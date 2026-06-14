@@ -1,8 +1,8 @@
 // Ad Maiorem Dei Gloriam!
 
+const Canvas = require("./Canvas.js");
 const crypto = require("node:crypto");
 const STATES = require("./States.js");
-const { type } = require("node:os");
 
 class Room {
     constructor(password) {
@@ -16,7 +16,7 @@ class Room {
         this.state = STATES.WAITING;
         this.secretWord = null;
 
-        this.canvas = new Uint8Array(30 * 30);
+        this.canvas = new Canvas(30, 30);
         this.defaultTime = 10; // seconds
         this.remainingTime = 0;
         this.timer = null; // for setInterval;
