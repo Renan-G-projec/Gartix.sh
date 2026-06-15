@@ -5,9 +5,9 @@ const crypto = require("node:crypto");
 const STATES = require("./States.js");
 
 class Room {
-    constructor(password) {
-        this.password = password;
+    constructor(code) {
 
+        this.code = code;
         this.players = new Map();
         this.numPlayers = 0;
         this.maxPlayers = 10;
@@ -26,14 +26,9 @@ class Room {
         this.playersToDraw = null;
     }
 
-    addPlayer(player, providedPassword) {
+    addPlayer(player) {
         if (this.numPlayers >= this.maxPlayers) {
             return { success: false, reason: "Maximum capacity exceed."};
-        }
-
-        if (this.password) {
-            if (!providedPassword) return { success: false, reason: "Room needs password but none was provided." };
-            if (providedPassword != this.password) return { success: false, reason: "Incorrect password provided."};
         }
 
         this.players.set(player.id, player);
@@ -92,7 +87,7 @@ class Room {
         this.broadcast({ type: "ROUND_END", reason: reason });
     }
 
-    // calls the parser to parsae the object into bytes after
+    // calls the parser to parse the object into bytes after
     broadcast(message) {
         // Mock functionality
         console.log(`[BROADCAST_TEMP] - type: ${message.type}, reason: ${message.reason}`);
