@@ -1,13 +1,16 @@
 // Ad Maiorem Dei Gloriam!
 const ws = require("ws");
 const crypto = require("node:crypto");
+const CommandParser = require("./CommandParser.js");
 const Player = require("./Player.js");
 
 class NetworkManager {
-    constructor() {
+    constructor(commandParser) {
         this.server = new ws.WebSocketServer({ port: 8080 });
         this.players = new Map();
         this.sockets = new Map();
+
+        this.cmdParser = commandParser;
     }
 
     init() {
@@ -21,6 +24,11 @@ class NetworkManager {
 
             socket.on("close", () => {
                 console.log(`[NETWORK MANAGER] - Player ${playerID} disconnected.`);
+            })
+
+            socket.on("message", (data) => {
+                const response = this.cmdParser.executeCommand(JSON.parse(data), this.players.get(playerID));
+                if (response.error) socket.send(JSON.stringify(response.error));
             })
 
             socket.on("error", (err) => {

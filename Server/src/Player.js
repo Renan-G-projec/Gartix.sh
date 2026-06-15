@@ -16,6 +16,12 @@ class Player {
         this.guessed = false;
     }
 
+    setNickname(name) {
+        this.nickname = name;
+
+        return {success: true};
+    }
+    
     setId(id) { this.id = id; }
 
     addScore(score)  {
