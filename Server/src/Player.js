@@ -1,11 +1,10 @@
 // Ad Maiorem Dei Gloriam!
 
 class Player {
-    constructor(nickname, token) {
+    constructor(nickname, id) {
         this.nickname = nickname;
-        this.id = null;
+        this.id = id;
 
-        this.token = token; 
         this.commandsSent = 0;
         this.commandDelayMean = null;
 

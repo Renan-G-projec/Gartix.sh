@@ -8,7 +8,7 @@ class Room {
     constructor(code) {
 
         this.code = code;
-        this.players = new Map();
+        this.players = [];
         this.numPlayers = 0;
         this.maxPlayers = 10;
         this.drawingPlayerID = null;
@@ -26,16 +26,16 @@ class Room {
         this.playersToDraw = null;
     }
 
-    addPlayer(player) {
+    addPlayer(playerId) {
         if (this.numPlayers >= this.maxPlayers) {
             return { success: false, reason: "Maximum capacity exceed."};
         }
 
-        this.players.set(player.id, player);
+        this.players.push(playerId);
         this.numPlayers++;
 
-        this.playerQueue.push(player.id);
-        this.broadcast({ type: "PLAYER_JOIN", nickname: player.nickname});
+        this.playerQueue.push(playerId);
+        this.broadcast({ type: "PLAYER_JOIN", id: playerId});
 
         return { success: true };
     }
