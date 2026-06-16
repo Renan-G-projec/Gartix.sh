@@ -5,6 +5,7 @@ class Player {
         this.nickname = nickname;
         this.id = id;
 
+        this.onGame = false;
         this.commandsSent = 0;
         this.commandDelayMean = null;
 

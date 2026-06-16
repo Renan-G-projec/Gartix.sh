@@ -5,10 +5,10 @@ const crypto = require("node:crypto");
 const STATES = require("./States.js");
 
 class Room {
-    constructor(code) {
+    constructor(code, networkManager) {
 
         this.code = code;
-        this.players = [];
+        this.players = new Map();
         this.numPlayers = 0;
         this.maxPlayers = 10;
         this.drawingPlayerID = null;
@@ -24,32 +24,34 @@ class Room {
         this.playerQueue = [];
 
         this.playersToDraw = null;
+
+        this.networkManager = networkManager;
     }
 
-    addPlayer(playerId) {
+    addPlayer(player) {
         if (this.numPlayers >= this.maxPlayers) {
             return { success: false, reason: "Maximum capacity exceed."};
         }
 
-        this.players.push(playerId);
+        this.players.set(player.id, player);
         this.numPlayers++;
 
-        this.playerQueue.push(playerId);
-        this.broadcast({ type: "PLAYER_JOIN", id: playerId});
+        this.playerQueue.push(player.id);
+        this.broadcast({ type: "PLAYER_JOIN", nick: player.nickname});
 
         return { success: true };
     }
 
-    destroyPlayer(playerUUID) {
-        if (!this.players.delete(playerUUID)) {
-            throw new Error("[ROOM_JS] - Tried to delete unexistent player.");
+    destroyPlayer(playerID) {
+        if (!this.players.delete(playerID)) {
+            throw new Error("[ROOM JS] - Tried to delete unexistent player.");
         }
         this.numPlayers--;
 
-        this.playerQueue = this.playerQueue.filter(id => id !== playerUUID);
+        this.playerQueue = this.playerQueue.filter(id => id !== playerID);
 
         // If the lefting player was the drawer
-        if (this.drawingPlayerID === playerUUID) {
+        if (this.drawingPlayer === playerID) {
             this.endRound("DRAWER_LEFT");
         }
     }
@@ -58,7 +60,7 @@ class Room {
         this.remainingTime = this.defaultTime;
         this.canvas.fill(0);
 
-        this.drawingPlayerID = this.playerQueue.shift();
+        this.drawingPlayer = this.playerQueue.shift();
         
 
         this.broadcast({ type: "ROUND_START" });
@@ -87,10 +89,8 @@ class Room {
         this.broadcast({ type: "ROUND_END", reason: reason });
     }
 
-    // calls the parser to parse the object into bytes after
     broadcast(message) {
-        // Mock functionality
-        console.log(`[BROADCAST_TEMP] - type: ${message.type}, reason: ${message.reason}`);
+        this.networkManager.broadcast(this.players.keys(), JSON.stringify(message));
     }
 
     verifyGuess(playerId, guess) {
