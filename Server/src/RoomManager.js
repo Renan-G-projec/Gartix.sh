@@ -7,6 +7,10 @@ class RoomManager {
         this.numRooms = 0;
     }
 
+    init(networkManager) {
+        this.networkManager = networkManager;
+    }
+
     playerJoin(providedCode, player) {
         const room = this.rooms.get(providedCode);
         if (!room) return { sucess: false, reason: "Incorrect code provided. No room matched the provided code."};
@@ -15,7 +19,7 @@ class RoomManager {
     }
 
     createRoom() {
-        const generateCode = () => { return Math.round(Math.random() * 9999999).toString().padStart(6, "0") }
+        const generateCode = () => { return Math.round(Math.random() * 999999).toString().padStart(6, "0") }
         let uniqueCodeGenerated = false;
         let codeGenerated;
 
@@ -25,7 +29,7 @@ class RoomManager {
             if (!this.rooms.has(codeGenerated)) uniqueCodeGenerated = true;
         }
 
-        this.rooms.set(codeGenerated, new Room(codeGenerated));
+        this.rooms.set(codeGenerated, new Room(codeGenerated, this.networkManager));
         console.log(`[ROOM MANAGER] - Generated room with code ${codeGenerated} at ${new Date()}.`);
 
         return codeGenerated;

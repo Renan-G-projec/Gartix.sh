@@ -1,13 +1,11 @@
 // Ad Maiorem Dei Gloriam!
-const Player = require("./Player.js");
-const RoomManager = require("./RoomManager.js");
-class CommandParser {
-    constructor(roomManager) {
-        this.roomManager = roomManager;
-        if (!roomManager) throw new Error("Room Manager not provided to Command Parser.");
-        if (!roomManager instanceof RoomManager) throw new TypeError("Room Manager incorrect type to Command Parser.");
-    }
 
+const Global = require("./Global.js");
+
+class CommandParser {
+
+    init(roomManager) { this.roomManager = roomManager; }
+    
     executeCommand(object, player) {
         const { opcode, args } = object;
         switch (opcode) {

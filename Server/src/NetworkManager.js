@@ -1,19 +1,17 @@
 // Ad Maiorem Dei Gloriam!
 const ws = require("ws");
 const crypto = require("node:crypto");
-const CommandParser = require("./CommandParser.js");
 const Player = require("./Player.js");
 
 class NetworkManager {
-    constructor(commandParser) {
+    constructor() {
         this.server = new ws.WebSocketServer({ port: 8080 });
         this.players = new Map();
         this.sockets = new Map();
-
-        this.cmdParser = commandParser;
     }
 
-    init() {
+    init(commandParser) {
+        this.commandParser = commandParser;
         this.server.on("connection", (socket, req) => {
 
             const playerID = crypto.randomUUID();
@@ -27,7 +25,7 @@ class NetworkManager {
             })
 
             socket.on("message", (data) => {
-                const response = this.cmdParser.executeCommand(JSON.parse(data), this.players.get(playerID));
+                const response = this.commandParser.executeCommand(JSON.parse(data), this.players.get(playerID));
                 if (!response.success) socket.send(JSON.stringify(response.reason));
             })
 

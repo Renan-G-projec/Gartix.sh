@@ -1,13 +1,13 @@
 // Ad Maiorem Dei Gloriam!
 
 const Canvas = require("./Canvas.js");
-const crypto = require("node:crypto");
 const STATES = require("./States.js");
 
 class Room {
     constructor(code, networkManager) {
 
         this.code = code;
+        this.networkManager = networkManager;
         this.players = new Map();
         this.numPlayers = 0;
         this.maxPlayers = 10;
@@ -24,8 +24,6 @@ class Room {
         this.playerQueue = [];
 
         this.playersToDraw = null;
-
-        this.networkManager = networkManager;
     }
 
     addPlayer(player) {
@@ -90,7 +88,7 @@ class Room {
     }
 
     broadcast(message) {
-        this.networkManager.broadcast(this.players.keys(), JSON.stringify(message));
+        this.networkManager.broadcast(Object.keys(this.players), JSON.stringify(message));
     }
 
     verifyGuess(playerId, guess) {
