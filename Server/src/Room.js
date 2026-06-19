@@ -4,64 +4,65 @@ const Canvas = require("./Canvas.js");
 const STATES = require("./States.js");
 
 class Room {
-    constructor(code, networkManager) {
-
-        this.code = code;
+    constructor(networkManager) {
         this.networkManager = networkManager;
+
         this.players = new Map();
-        this.numPlayers = 0;
-        this.maxPlayers = 10;
-        this.drawingPlayerID = null;
+        this.playerQueue = [];
+        this.drawingPlayerId = null;
 
         this.state = STATES.WAITING;
         this.secretWord = null;
 
         this.canvas = new Canvas(30, 30);
-        this.defaultTime = 10; // seconds
+
         this.remainingTime = 0;
         this.timer = null; // for setInterval;
 
-        this.playerQueue = [];
-
-        this.playersToDraw = null;
+        this.scores = new Map();
     }
 
-    addPlayer(player) {
-        if (this.numPlayers >= this.maxPlayers) {
-            return { success: false, reason: "Maximum capacity exceed."};
-        }
+    /**
+     * @description Adds the player ID and pushes it to the drawing queue. Also broadcasts it to all the players
+     * @param {String} playerId
+     */
+    addPlayer(playerId) {
 
-        this.players.set(player.id, player);
-        this.numPlayers++;
-
+        this.players.set(playerId, false);
         this.playerQueue.push(player.id);
+
+        const player = {}; // TODO: implement the network manager ref here
         this.broadcast({ type: "PLAYER_JOIN", nick: player.nickname});
 
         return { success: true };
     }
 
-    destroyPlayer(playerID) {
-        if (!this.players.delete(playerID)) {
-            throw new Error("[ROOM JS] - Tried to delete unexistent player.");
-        }
-        this.numPlayers--;
-
+    /** 
+     * @description Removes the player and broadcasts to the others
+     * @param {String} playerId
+    */
+    destroyPlayer(playerId) {
+        this.players.delete(playerId);
         this.playerQueue = this.playerQueue.filter(id => id !== playerID);
 
         // If the lefting player was the drawer
-        if (this.drawingPlayer === playerID) {
+        if (this.drawingPlayer === playerID && this.state == STATES.DRAWING) {
             this.endRound("DRAWER_LEFT");
         }
     }
 
+    /**
+     * @description Initializes the game and the timer
+     */
     initRound() {
-        this.remainingTime = this.defaultTime;
+        this.remainingTime = 60;
         this.canvas.fill(0);
 
-        this.drawingPlayer = this.playerQueue.shift();
-        
+        this.drawingPlayerId = this.playerQueue.shift();
+        this.players.forEach((val, key) => {this.players.set(key, false)}); // Resets all the values
 
-        this.broadcast({ type: "ROUND_START" });
+        const player = {}; // TODO: Implement the GetPlayer for networkManager;
+        this.broadcast({ type: "ROUND_START", nick: player.nick });
         this.state = STATES.DRAWING;
         
         this.timer = setInterval(() => this.tick(), 1000);
@@ -85,18 +86,36 @@ class Room {
 
         this.state = STATES.WAITING;
         this.broadcast({ type: "ROUND_END", reason: reason });
+
+        if (this.playerQueue.length > 0) {
+            this.state = STATES.WAITING;
+            setTimeout(() => {
+                this.initRound();
+            }, this.timeBetweenRounds * 1000);
+        } else {
+            this.state = STATES.FINISHED;
+            this.broadcast({type: "GAME_END"});
+        }
     }
 
     broadcast(message) {
-        this.networkManager.broadcast(Object.keys(this.players), JSON.stringify(message));
+        this.networkManager.broadcast(this.players, JSON.stringify(message));
     }
 
     verifyGuess(playerId, guess) {
+        const alreadyGuessed = this.players.get(playerId);
+        const isDrawing = this.drawingPlayerId == playerId;
+
+        if (alreadyGuessed) return {success: false, reason: "You've already guessed."};
+        if (isDrawing) return {success: false, reason: "Player currently drawing."};
         
+        const player = {};
+        if (guess == this.secretWord) this.broadcast({type: "PLAYER_GUESSED", nick: player.nick});
+        return {success: true};
     }
 
     applyCommand(opcode, args) {
-
+        
     }
 
 

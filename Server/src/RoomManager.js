@@ -4,7 +4,6 @@ const Room = require('./Room.js');
 class RoomManager {
     constructor() {
         this.rooms = new Map();
-        this.numRooms = 0;
     }
 
     init(networkManager) {
@@ -15,6 +14,7 @@ class RoomManager {
         const room = this.rooms.get(providedCode);
         if (!room) return { sucess: false, reason: "Incorrect code provided. No room matched the provided code."};
         if (player.onGame) return { sucess: false, reason: "Player are in a game. Leave the current room before entering another."};
+        player.gameCode = providedCode;
         return room.addPlayer(player);
     }
 

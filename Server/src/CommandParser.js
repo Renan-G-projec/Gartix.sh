@@ -18,7 +18,13 @@ class CommandParser {
                 const code = args[0];
                 console.log(code);
                 return (this.roomManager.playerJoin(code, player));
+            case 3: // CREATE ROOM
+                const generatedRoomCode = this.roomManager.createRoom();
+                const response = { success: true, data: generatedRoomCode };
 
+                return (response);
+
+            
         }
     }
 }

@@ -26,6 +26,7 @@ class NetworkManager {
 
             socket.on("message", (data) => {
                 const response = this.commandParser.executeCommand(JSON.parse(data), this.players.get(playerID));
+                if (response.data) socket.send(JSON.stringify(response.data));
                 if (!response.success) socket.send(JSON.stringify(response.reason));
             })
 
